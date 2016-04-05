@@ -77,26 +77,33 @@ for k = 1:size(lines2, 1)
 end
 
 %%
-% remove all pts from image near lines
-thresh = avgIslandSize/10;
-for xxx = 1:size(ckt,2)
-    for yyy = 1:size(ckt,1)
-        if(ckt(yyy,xxx) == 1)
-            for lx = 1:size(lines2,1)
-               v = [lines2(lx,4)-lines2(lx,2), -(lines2(lx,3)-lines2(lx,1))];
-               midpt = [lines2(lx,1)+lines2(lx,3), lines2(lx,2)+lines2(lx,4)]/2;
-               dm = sqrt((midpt(1)-xxx)^2 + (midpt(2)-yyy)^2);
-               len = sqrt((lines2(lx,1)-lines2(lx,3))^2 + (lines2(lx,2)-lines2(lx,4))^2);
-               r = [lines2(lx,1)-xxx, lines2(lx,2)-yyy];
-               dist = abs(dot(v/norm(v),r));
-               if(dist<thresh && dm <= len/2)
-                   ckt(yyy,xxx) = 0;
-               end
-            end
+image = ckt;
+point_mtx = lines2;
+thickness = 30;
+for ii = 1:size(point_mtx,1)
+    if (abs(point_mtx(ii,1)-point_mtx(ii,3))< abs(point_mtx(ii,2)-point_mtx(ii,4)))
+        x1 = point_mtx(ii,2); y1 = point_mtx(ii,1);
+        x2 = point_mtx(ii,4); y2 = point_mtx(ii,3);
+        horiz = 0;
+    else
+        x1 = point_mtx(ii,1);y1 = point_mtx(ii,2);
+        x2 = point_mtx(ii,3);y2 = point_mtx(ii,4);
+        horiz = 1;
+    end
+    mm = (y2-y1)/(x2-x1);
+    bb = y1 - mm*x1;
+    for xx = min(x1,x2):max(x1,x2)
+        yy = round(mm*xx+bb);
+        yy_min = yy-thickness;
+        yy_max = yy+thickness;
+        if (horiz == 1)
+            image([yy_min:yy_max],xx)=0;
+        else
+            image(xx,[yy_min:yy_max])=0;
         end
     end
 end
-figure; imshow(ckt);
+ckt = image;
 %%
 figure; imshow(~cktOrig);
 [foo,bar]=bwlabel(ckt);

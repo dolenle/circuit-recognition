@@ -1,0 +1,17 @@
+*** MODEL DESCRIPTION ***
+.model mod1 npn bf=150 
+.model mod2 pnp bf=150 
+
+*** NETLIST DESCRIPTION ***
+
+V1 2 0 sin(0 1.00 1000.00 0 0)
+R1 3 2 10000.0
+
+Q1 6 3 5 mod1
+R2 5 0 10000.0
+R3 7 6 10000.0
+V2 7 0 dc 5.00
+
+
+*** MODEL DESCRIPTION ***
+.tran 10m
